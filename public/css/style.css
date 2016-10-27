@@ -1,0 +1,27 @@
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro");
+header {
+  width: 100%;
+  height: auto;
+  text-align: center;
+  background-color: #bae3f5;
+  border: solid 2px gray;
+  padding: 30px;
+  margin-bottom: 50px; }
+  header h1 {
+    font-family: "Source Sans Pro", sans-serif; }
+
+#poll-container {
+  width: 33%;
+  text-align: center;
+  border-top: 2px solid gray;
+  border-left: 2px solid gray;
+  border-bottom: 2px solid gray; }
+  #poll-container .poll {
+    background-color: #d7ffc4;
+    font-family: "Helvetica", sans-serif;
+    cursor: pointer;
+    padding: 10px; }
+  #poll-container .poll:hover {
+    background-color: #c0fabe; }
+
+/*# sourceMappingURL=style.css.map */
