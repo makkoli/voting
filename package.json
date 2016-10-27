@@ -1,0 +1,22 @@
+{
+  "name": "voting",
+  "version": "1.0.0",
+  "description": "voting app with authentication",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/makkoli/voting.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/makkoli/voting/issues"
+  },
+  "homepage": "https://github.com/makkoli/voting#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
