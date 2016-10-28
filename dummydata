@@ -1,0 +1,32 @@
+[
+    {name: "Which was the better captain?",
+    options: [
+        {name: "Kirk", votes: 10},
+        {name: "Picard", votes: 9},
+        {name: "Janeway", votes: 4},
+        {name: "Sisko", votes: 7}
+    ]},
+    {name: "Yahoo vs Bing",
+    options: [
+        {name: "Yahoo", votes: 6},
+        {name: "Bing", votes: 7}
+    ]},
+    {name: "Best trilogy?",
+    options: [
+        {name: "Lord of the Rings", votes: 10},
+        {name: "The Matrix", votes: 4},
+        {name: "Godfather", votes: 10},
+        {name: "Star Wars OT", votes: 8}
+    ]},
+    {name: "Best OS?",
+    options: [
+        {name: "Linux", votes: 7},
+        {name: "Windows", votes: 2},
+        {name: "OS X", votes: 5}
+    ]},
+    {name: "Android vs iPhone",
+    options: [
+        {name: "Android", votes: 7},
+        {name: "iPhone", votes: 7}
+    ]}
+]

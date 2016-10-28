@@ -5,22 +5,34 @@ header
     height: auto
     text-align: center
     background-color: #bae3f5
-    border: solid 2px gray
+    border-bottom: solid 2px gray
     padding: 30px
     margin-bottom: 50px
     h1
         font-family: 'Source Sans Pro', sans-serif
 
-#poll-container
-    width: 33%
-    text-align: center
-    border-top: 2px solid gray
-    border-left: 2px solid gray
-    border-bottom: 2px solid gray
-    .poll
-        background-color: #d7ffc4
-        font-family: 'Helvetica', sans-serif
-        cursor: pointer
-        padding: 10px
-    .poll:hover
-        background-color: #c0fabe
+.poll-container
+    border: 2px solid gray
+    padding: 0
+    ul
+        margin: 0
+        float: left
+        width: 33%
+        text-align: center
+        padding: 0
+        border-right: 2px solid #067009
+        li
+            background-color: #d7ffc4
+            font-family: 'Helvetica', sans-serif
+            cursor: pointer
+            padding-top: 10px
+            padding-bottom: 10px
+            list-style-type: none
+            margin: 2px 0 2px 0
+        li:hover
+            background-color: #c0fabe
+    .poll-body
+        float: right
+        margin: 30px 0 30px 0
+        text-align: center
+        width: 66%

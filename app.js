@@ -1,12 +1,15 @@
 var express = require('express'),
+    MongoClient = require('mongodb').MongoClient,
     app = express();
 
 var oneDay = 86400000;
 
 app.use(express.static(__dirname + '/public', { maxAge: oneDay }));
 
-app.get('/', function(req, res) {
-    res.sendFile(__dirname + '/public/index.html');
+MongoClient.connect('mongodb://localhost:27017/voting', function(err, db) {
+    app.get('/', function(req, res) {
+        res.sendFile(__dirname + '/public/index.html');
+    });
 });
 
 var server = app.listen(8000, function() {
