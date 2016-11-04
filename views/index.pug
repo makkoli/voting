@@ -1,0 +1,15 @@
+doctype 5
+html
+    head
+        meta(content="text/html;charset=utf-8", http-equiv="Content-Type")
+        title FCC Voting
+        link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css")
+        link(rel="stylesheet", href="/css/style.css" type="text/css")
+    body
+        header
+            h1 FCC Voting
+        div(class="container poll-container")
+            ul
+                each poll, name in polls
+                    a(href='poll/' + poll.link)
+                        li= poll.name

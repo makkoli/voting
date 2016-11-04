@@ -1,0 +1,20 @@
+doctype 5
+html
+    head
+        meta(content="text/html;charset=utf-8", http-equiv="Content-Type")
+        title= name
+        link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css")
+        link(rel="stylesheet", href="/css/style.css" type="text/css")
+    body
+        header
+            h1 FCC Voting
+        div(class="container poll-container")
+            h2= name
+            div(class="row")
+                div(class="col-xs-6")
+                    form
+                        each option, name in options
+                            input(type="radio", name="option", value= option.name)
+                            p= option.name
+                            br
+                div(class="col-xs-6")
