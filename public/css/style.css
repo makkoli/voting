@@ -36,6 +36,7 @@ header {
     margin-bottom: 75px; }
   .poll-container form {
     text-align: left;
+    padding-top: 10%;
     padding-left: 30%;
     margin-left: 75px; }
     .poll-container form input {
@@ -44,5 +45,8 @@ header {
       display: inline;
       padding-left: 5px;
       font-size: large; }
+  .poll-container canvas {
+    padding-right: 75px;
+    margin-bottom: 75px; }
 
 /*# sourceMappingURL=style.css.map */
