@@ -1,9 +1,11 @@
 // Generates the chart to display the results of a poll
+// @label: labels for the chart
+// @votes: vote count for each option
 function generateChart(labels, votes) {
     var context = document.getElementById("pollChart");
-    //var pollLabels = options.map(function(curr) { return curr.name });
     labels = labels.split(',');
     votes = votes.split(',');
+
     var myChart = new Chart(context, {
         type: 'bar',
         data: {

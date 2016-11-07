@@ -1,10 +1,13 @@
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro')
 
+$default-vert-padding: 10%
+
 header
     width: 100%
     height: auto
     text-align: center
     background-color: #bae3f5
+    border-top: solid 2px gray
     border-bottom: solid 2px gray
     padding: 30px
     margin-bottom: 50px
@@ -34,12 +37,11 @@ header
     h2
         font-family: 'Source Sans Pro', sans-serif
         margin-top: 35px
-        margin-bottom: 75px
-    form
+    form[role="poll"]
         text-align: left
-        padding-top: 10%
-        padding-left: 30%
-        margin-left: 75px
+        padding-top: $default-vert-padding
+        padding-bottom: $default-vert-padding
+        padding-left: 40%
         input
             margin-bottom: 25px
         p
@@ -48,4 +50,11 @@ header
             font-size: large
     canvas
         padding-right: 75px
-        margin-bottom: 75px
+        margin-bottom: $default-vert-padding
+    form[role="login"]
+        width: 50%
+        padding-top: 50px
+        margin: 0 auto
+        padding-bottom: $default-vert-padding
+        button
+            float: right

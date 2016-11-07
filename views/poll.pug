@@ -8,13 +8,18 @@ html
         script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js")
         script(src="/js/voting.js")
     body
+        nav(class="navbar navbar-default navbar-static-top")
+            div(class="container")
+                a(class="navbar-brand navbar-left", href="/") Home
+                a(class="navbar-brand navbar-right", href="/login") Login
+                a(class="navbar-brand navbar-right", href="/register") Register
         header
             h1 FCC Voting
         div(class="container poll-container")
             h2= name
             div(class="row")
                 div(class="col-xs-6")
-                    form(action="/poll/" + link, method="post")
+                    form(action="/poll/" + link, method="post" role="poll")
                         each label in labels
                             input(type="radio", name="option", value= label)
                             p= label
