@@ -1,0 +1,16 @@
+// Navigation bar mixin for the template
+
+mixin navbar(logged, user)
+    // Check if passport has set a login session
+    if logged
+        nav(class="navbar navbar-default navbar-static-top")
+            div(class="container")
+                a(class="navbar-brand navbar-left", href="/") Home
+                a(class="navbar-brand navbar-right", href="/logout") Logout
+                a(class="navbar-brand navbar-right", href="/" + user + "/polls") My Polls
+    else
+        nav(class="navbar navbar-default navbar-static-top")
+            div(class="container")
+                a(class="navbar-brand navbar-left", href="/") Home
+                a(class="navbar-brand navbar-right", href="/login") Login
+                a(class="navbar-brand navbar-right", href="/register") Register

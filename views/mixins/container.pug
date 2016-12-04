@@ -1,0 +1,13 @@
+// Mixin that contains the shared elements of the template
+
+include head.pug
+include header.pug
+include navbar.pug
+
+mixin container(logged, user)
+    doctype transitional
+    html
+        +head
+        body
+            +navbar(logged, user)
+            +header

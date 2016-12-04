@@ -1,28 +1,17 @@
-doctype transitional
-html
-    head
-        meta(content="text/html;charset=utf-8", http-equiv="Content-Type")
-        title FCC Voting
-        link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css")
-        link(rel="stylesheet", href="/css/style.css" type="text/css")
-    body
-        nav(class="navbar navbar-default navbar-static-top")
-            div(class="container")
-                a(class="navbar-brand navbar-left", href="/") Home
-                a(class="navbar-brand navbar-right", href="/login") Login
-                a(class="navbar-brand navbar-right", href="/register") Register
-        header
-            h1 FCC Voting
-        div(class="container poll-container")
-            h2 Register
-            form(action="/register", method="post" class="form-horizontal" role="login")
-                div(class="form-group")
-                    label(for="username" class="col-sm-2 control-label") Username:
-                    div(class="col-sm-10")
-                        input(type="text", name="username" class="form-control")
-                div(class="form-group")
-                    label(for="password" class="col-sm-2 control-label") Password:
-                    div(class="col-sm-10")
-                        input(type="text", name="password" class="form-control")
-                div
-                    button(type="submit", value="Register" class="btn btn-info") Register
+include mixins/container.pug
+
++container(logged)
+div(class="container poll-container")
+    h2 Register
+    form(action="/register", method="post" class="form-horizontal" role="login")
+        div(class="form-group")
+            label(for="username" class="col-sm-2 control-label") Username:
+            div(class="col-sm-10")
+                input(type="text", name="username" class="form-control")
+        div(class="form-group")
+            label(for="password" class="col-sm-2 control-label") Password:
+            div(class="col-sm-10")
+                input(type="password", name="password" class="form-control")
+        div
+            button(type="submit", value="Register" class="btn btn-info") Register
+        h4(style="color:red;")= error

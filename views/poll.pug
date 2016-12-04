@@ -1,31 +1,19 @@
-doctype transitional
-html
-    head
-        meta(content="text/html;charset=utf-8", http-equiv="Content-Type")
-        title= name
-        link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css")
-        link(rel="stylesheet", href="/css/style.css" type="text/css")
-        script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js")
-        script(src="/js/voting.js")
-    body
-        nav(class="navbar navbar-default navbar-static-top")
-            div(class="container")
-                a(class="navbar-brand navbar-left", href="/") Home
-                a(class="navbar-brand navbar-right", href="/login") Login
-                a(class="navbar-brand navbar-right", href="/register") Register
-        header
-            h1 FCC Voting
-        div(class="container poll-container")
-            h2= name
-            div(class="row")
-                div(class="col-xs-6")
-                    form(action="/poll/" + link, method="post" role="poll")
-                        each label in labels
-                            input(type="radio", name="option", value= label)
-                            p= label
-                            br
-                        input(class="btn btn-info", type="submit", value="Vote")
-                div(class="col-xs-6")
-                    canvas(id="pollChart", width="300", height="200")
-                    script.
-                        generateChart("#{labels}", "#{votes}")
+include mixins/container.pug
+
++container(logged)
+div(class="container poll-container")
+    h2= name
+    div(class="row")
+        div(class="col-xs-6")
+            form(action="/poll/" + link, method="post" role="poll")
+                each label in labels
+                    input(type="radio", name="option", value= label)
+                    p= label
+                    br
+                input(class="btn btn-info", type="submit", value="Vote")
+        div(class="col-xs-6")
+            canvas(id="pollChart", width="300", height="200")
+            script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js")
+            script(src="/js/voting.js")
+            script.
+                generateChart("#{labels}", "#{votes}")
