@@ -1,0 +1,22 @@
+include mixins/container.pug
+
++container(logged, user)
+div(class="container poll-container")
+    h2 Create a Poll
+    h6(style="color:red;") * = required
+    h4= error
+    form(action="/" + user + "/create" method="post" class="form-horizontal" role="create-poll")
+        div(class="form-group")
+            label(for="question" class="col-sm-2 control-label") Question*
+            div(class="col-sm-10")
+                input(type="text" class="form-control" name="question")
+        - for (var i = 1; i <= 10; i++)
+            div(class="form-group")
+                if i <= 2
+                    label(for="option " + i class="col-sm-2 control-label") Option #{i}*
+                else
+                    label(for="option " + i class="col-sm-2 control-label") Option #{i}
+                div(class="col-sm-10")
+                    input(type="text" class="form-control" name="option_" + i)
+        div
+            button(type="submit" value="Create" class="btn btn-info") Create Poll

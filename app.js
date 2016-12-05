@@ -1,13 +1,13 @@
 var express = require('express'),
     MongoClient = require('mongodb').MongoClient,
-    votingHelper = require('./votinghelper.js'),
+    votingHelper = require('./helper/votinghelper').votingHelper,
     bodyParser = require('body-parser'),
     helmet = require('helmet'),
     passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
     mongoose = require('mongoose'),
-    User = require('./user-model'),
-    Poll = require('./poll-model'),
+    User = require('./models/user-model'),
+    Poll = require('./models/poll-model'),
     app = express();
 
 var dbConnStr = 'mongodb://localhost:27017/voting';
@@ -84,45 +84,72 @@ passport.deserializeUser(function(user, done) {
 
 /*************** Get Page Requests ***************/
 // Home page that contains a list of all polls
-app.get('/', function(req, res) {
+app.get('/', getLoginSession, function(req, res) {
     console.log(req.session);
 
+    // Query parameters to get all polls in db
     var query = {};
     var projection = "link name";
     var sort = { date: -1 };
 
-    var sess = votingHelper.getLoginSession(req.session.passport);
-    console.log(sess);
-
+    // Get all the polls in the database
     Poll.find(query, projection, { sort: sort }, function(err, docs) {
         if (err) throw err;
 
         res.render('index', {
-            logged: req.session.passport == undefined ? false : true,
-            user: req.session.passport == undefined ? "" : req.session.passport.user.username,
+            logged: res.locals.logged,
+            user: res.locals.user,
             polls: docs
         });
     })
 });
 
 // Load a page with the poll for the user to vote on
-app.get('/poll/:link', getPollInfo, function(req, res) {
-    res.render('poll', { name: res.locals.name, labels: res.locals.labels,
-                        votes: res.locals.votes, link: req.params.link });
+app.get('/poll/:link', getLoginSession, function(req, res) {
+    var query =  { link: req.params.link };
+    var projection = { _id: 0, name: 1, options: 1 };
+
+    Poll.findOne(query, projection, function(err, doc) {
+        if (err) throw err;
+
+        res.render('poll', {
+            logged: res.locals.logged,
+            user: res.locals.user,
+            name: doc.name,
+            labels: doc.options.map(function(curr) { return curr.name; }),
+            votes: doc.options.map(function(curr) { return curr.votes; }),
+            link: req.params.link
+        });
+    });
 });
 
 // Login page
-app.get('/login', function(req, res) {
-    res.render("login");
+app.get('/login', getLoginSession, function(req, res) {
+    if (res.locals.logged) {
+        res.redirect('/');
+    }
+    else {
+        res.render('login');
+    }
 });
 
 // Register page
-app.get('/register', function(req, res) {
-    res.render('register', { error: "" });
+app.get('/register', getLoginSession, function(req, res) {
+    if (res.locals.logged) {
+        res.redirect('/');
+    }
+    else {
+        res.render('register', { error: "" });
+    }
 });
 
 // Get a users polls
-app.get('/:user/polls', function(req, res) {
+app.get('/:user/polls', getLoginSession, function(req, res) {
+    // Redirect to unauthorized access if not logged in or different user
+    if (!res.locals.logged || res.locals.user != req.params.user) {
+        res.render('template', { message: "Unauthorized" });
+    }
+
     var query = { creator: req.params.user };
     var projection = "link name";
     var sort = { date: -1 };
@@ -130,20 +157,40 @@ app.get('/:user/polls', function(req, res) {
     Poll.find(query, projection, { sort: sort }, function(err, docs) {
         if (err) throw err;
 
-        console.log(docs);
-
         res.render('user_polls', {
+            logged: res.locals.logged,
+            user: res.locals.user,
             polls: docs
         });
+    });
+});
+
+// Get the create poll page
+app.get('/:user/create', getLoginSession, function(req, res) {
+    // Redirect to unauthorized access if not logged in or different user
+    if (!res.locals.logged || res.locals.user != req.params.user) {
+        res.render('template', { message: "Unauthorized" });
+    }
+
+    res.render('create_poll', {
+        logged: res.locals.logged,
+        user: res.locals.user
     });
 });
 
 
 /*************** Post Page Requests ***************/
 // Updates a poll after any user has voted on it
-app.post('/poll/:link', [updatePollVote, getPollInfo], function(req, res) {
-    res.render('poll', { name: res.locals.name, labels: res.locals.labels,
-                        votes: res.locals.votes, link: req.params.link });
+app.post('/poll/:link', function(req, res) {
+    var query = { link: req.params.link, "options.name": req.body.option };
+    var updateParam = { "$inc": { "options.$.votes": 1 } };
+
+    Poll.update(query, updateParam, null, function(err) {
+        if (err) throw err;
+
+        // Redirect back to updated poll page
+        res.redirect('/poll/' + req.params.link);
+    });
 });
 
 // Handle a user logging in
@@ -188,46 +235,41 @@ app.post('/register', function(req, res) {
     }
 });
 
+// Add a new poll to the database
+app.post('/:user/create', getLoginSession, function(req, res) {
+    // Check for a question
+    if (!req.body.question) {
+        res.render('create_poll', {
+            logged: res.locals.logged,
+            user: res.locals.user,
+            error: "Question is required"
+        });
+    }
+
+    // Check for at least 2 answers
+    if (!(req.body.option_1 && req.body.option_2)) {
+        res.render('create_poll', {
+            logged: res.locals.logged,
+            user: res.locals.user,
+            error: "At least 2 options are required"
+        });
+    }
+
+    // Else, add the new poll to the database
+    var votingHelp = new votingHelper();
+
+
+});
+
 /************************************************/
 
 /**************** Middleware ****************/
 
-// Gets the info for a specific poll
-function getPollInfo(req, res, next) {
-    MongoClient.connect('mongodb://localhost:27017/voting', function(err, db) {
-        if (err) {
-            console.log(err);
-        }
+function getLoginSession(req, res, next) {
+    res.locals.logged = req.session.passport == undefined ? false : true,
+    res.locals.user = req.session.passport == undefined ? "" : req.session.passport.user.username
 
-        var query =  { link: req.params.link };
-        var projection = { _id: 0, name: 1, options: 1 };
-
-        db.collection('polls').find(query, projection).toArray(function(err, docs) {
-            if (err) {
-                console.log(err);
-            }
-
-            res.locals.name = docs[0].name;
-            res.locals.labels = docs[0].options.map(function(curr) { return curr.name });
-            res.locals.votes = docs[0].options.map(function(curr) { return curr.votes });
-            next();
-        });
-    });
-};
-
-// Update a poll when a user votes
-function updatePollVote(req, res, next) {
-    MongoClient.connect('mongodb://localhost:27017/voting', function(err, db) {
-        if (err) {
-            console.log(err);
-        }
-
-        var query = { link: req.params.link, "options.name": req.body.option };
-        var updateParam = { "$inc": { "options.$.votes": 1 } };
-
-        db.collection('polls').updateOne(query, updateParam);
-        next();
-    });
+    next();
 };
 
 /****************************************/

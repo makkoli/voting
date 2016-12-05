@@ -6,4 +6,5 @@ div(class="container poll-container")
         each poll, name in polls
             a(href='/poll/' + poll.link)
                 li= poll.name
-    button(class="btn btn-primary btn-block") Create a new poll
+    form(action="/" + user + "/create")
+        button(class="btn btn-primary btn-block") Create a new poll
