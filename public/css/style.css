@@ -63,13 +63,19 @@ header {
     padding-top: 50px;
     margin: 0 auto;
     padding-bottom: 10%; }
-    .poll-container form[role="create-poll"] button {
+    .poll-container form[role="create-poll"] button[type="submit"] {
       float: right; }
-    .poll-container form[role="create-poll"] p {
-      display: inline;
-      margin: 0;
-      padding: 0; }
+    .poll-container form[role="create-poll"] button[type="button"] {
+      float: left; }
+    .poll-container form[role="create-poll"] input {
+      margin-bottom: 10px; }
   .poll-container h4 {
     color: red; }
+  .poll-container h3 {
+    text-decoration: underline;
+    margin-bottom: 10%; }
+  .poll-container form[role="add-option"] {
+    padding: 10%;
+    margin-bottom: 10%; }
 
 /*# sourceMappingURL=style.css.map */

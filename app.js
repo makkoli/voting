@@ -35,6 +35,9 @@ app.use(require('express-session')({
     secret: 'Super Sekret Password',
     resave: false,
     saveUninitialized: false,
+    cookie: {
+        maxAge: oneDay * 365    // year expiration
+    }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -52,7 +55,6 @@ passport.use(new LocalStrategy(
 
                 // Username not found
                 if (!user) {
-                    console.log('invalid user');
                     return done(null, false);
                 }
 
@@ -61,7 +63,6 @@ passport.use(new LocalStrategy(
                     username: username
                 });
                 if (user.comparePassword(password)) {
-                    console.log('invalid pass');
                     return done(null, false);
                 }
 
@@ -74,7 +75,6 @@ passport.use(new LocalStrategy(
 
 // Serialize and deserialize user instance
 passport.serializeUser(function(user, done) {
-    console.log(user);
     done(null, user);
 });
 
@@ -105,7 +105,7 @@ app.get('/', getLoginSession, function(req, res) {
 });
 
 // Load a page with the poll for the user to vote on
-app.get('/poll/:link', getLoginSession, function(req, res) {
+app.get('/poll/:link', [checkPollVotedOn, getLoginSession], function(req, res) {
     var query =  { link: req.params.link };
     var projection = { _id: 0, name: 1, options: 1 };
 
@@ -118,7 +118,9 @@ app.get('/poll/:link', getLoginSession, function(req, res) {
             name: doc.name,
             labels: doc.options.map(function(curr) { return curr.name; }),
             votes: doc.options.map(function(curr) { return curr.votes; }),
-            link: req.params.link
+            link: req.params.link,
+            votedOn: res.locals.voted,
+            error: res.locals.voted ? "You have already voted" : ""
         });
     });
 });
@@ -130,6 +132,22 @@ app.get('/login', getLoginSession, function(req, res) {
     }
     else {
         res.render('login');
+    }
+});
+
+// Logout a user
+app.get('/logout', getLoginSession, function(req, res) {
+    if (!res.locals.logged) {
+        res.render('template', { message: "You are not logged in" });
+    }
+    else {
+        req.logout();
+        req.session.passport = undefined;
+        res.render('template', {
+            logged: false,
+            user: "",
+            message: "You have logged out"
+        });
     }
 });
 
@@ -147,7 +165,7 @@ app.get('/register', getLoginSession, function(req, res) {
 app.get('/:user/polls', getLoginSession, function(req, res) {
     // Redirect to unauthorized access if not logged in or different user
     if (!res.locals.logged || res.locals.user != req.params.user) {
-        res.render('template', { message: "Unauthorized" });
+        res.render('template', { message: "404: Not Found" });
     }
 
     var query = { creator: req.params.user };
@@ -169,12 +187,32 @@ app.get('/:user/polls', getLoginSession, function(req, res) {
 app.get('/:user/create', getLoginSession, function(req, res) {
     // Redirect to unauthorized access if not logged in or different user
     if (!res.locals.logged || res.locals.user != req.params.user) {
-        res.render('template', { message: "Unauthorized" });
+        res.render('template', { message: "404: Not Found" });
     }
 
     res.render('create_poll', {
         logged: res.locals.logged,
         user: res.locals.user
+    });
+});
+
+// Get the details for a users poll
+app.get('/:user/polls/:link', getLoginSession, function(req, res) {
+    var query =  { link: req.params.link };
+    var projection = { _id: 0, name: 1, options: 1 };
+
+    Poll.findOne(query, projection, function(err, doc) {
+        if (err) throw err;
+
+        res.render('poll_details', {
+            logged: res.locals.logged,
+            user: res.locals.user,
+            name: doc.name,
+            labels: doc.options.map(function(curr) { return curr.name; }),
+            totalVotes: doc.options.reduce(function(total, next) { return total + next.votes; }, 0),
+            votes: doc.options.map(function(curr) { return curr.votes; }),
+            link: req.params.link
+        });
     });
 });
 
@@ -188,6 +226,14 @@ app.post('/poll/:link', function(req, res) {
     Poll.update(query, updateParam, null, function(err) {
         if (err) throw err;
 
+        // Create polls voted on array if doesn't exist
+        if (req.session.hasOwnProperty('votedOn')) {
+            req.session.votedOn = [req.params.link];
+        }
+        // Else, add poll to polls the user has voted on
+        else {
+            req.session.votedOn.push(req.params.link);
+        }
         // Redirect back to updated poll page
         res.redirect('/poll/' + req.params.link);
     });
@@ -245,32 +291,103 @@ app.post('/:user/create', getLoginSession, function(req, res) {
             error: "Question is required"
         });
     }
-
     // Check for at least 2 answers
-    if (!(req.body.option_1 && req.body.option_2)) {
+    else if (!(req.body.option_1 && req.body.option_2)) {
         res.render('create_poll', {
             logged: res.locals.logged,
             user: res.locals.user,
             error: "At least 2 options are required"
         });
     }
-
     // Else, add the new poll to the database
-    var votingHelp = new votingHelper();
+    else {
+        var pollLink = new votingHelper().generateId();
+        var pollOptions = [];
+        var i = 1;
+        var currentOption = "option_" + i;
 
+        // Add all the options inputted by user
+        while(req.body.hasOwnProperty(currentOption)) {
+            pollOptions.push({
+                name: req.body[currentOption],
+                votes: 0
+            });
 
+            i++;
+            currentOption = "option_" + i;
+        }
+
+        // Poll document to add
+        var poll = new Poll({
+            name: req.body.question,
+            options: pollOptions,
+            link: pollLink,
+            creator: req.params.user,
+            date: new Date()
+        });
+
+        // Save the new poll to the database
+        poll.save(function(err) {
+            if (err) throw err;
+
+            res.redirect('/poll/' + pollLink);
+        });
+    }
+});
+
+// Deletes a poll from the database
+app.post('/:user/polls/:link/delete', function(req, res) {
+    var query = { link: req.params.link };
+
+    Poll.findOneAndRemove(query, function(err) {
+        if (err) throw err;
+
+        res.redirect('/' + req.params.user + '/polls');
+    })
+});
+
+// Update the options in a user's poll
+app.post('/:user/polls/:link', function(req, res) {
+    var query = { link: req.params.link };
+    var updateParam = { "$addToSet": { "options": { "name" : req.body.option, "votes": 0 } } };
+
+    Poll.update(query, updateParam, null, function(err) {
+        if (err) throw err;
+
+        res.redirect('/' + req.params.user + '/polls/' + req.params.link);
+    });
 });
 
 /************************************************/
 
 /**************** Middleware ****************/
 
+// Gets login session for proper rendering
 function getLoginSession(req, res, next) {
     res.locals.logged = req.session.passport == undefined ? false : true,
     res.locals.user = req.session.passport == undefined ? "" : req.session.passport.user.username
 
     next();
 };
+
+// Checks if the poll has been voted on by the user
+function checkPollVotedOn(req, res, next) {
+    // Add the votedOn attribute to session if not already there
+    if (!req.session.hasOwnProperty('votedOn')) {
+        req.session.votedOn = [];
+    }
+
+    if (req.session.votedOn.some(function(ele) {
+        return ele == req.params.link;
+    })) {
+        res.locals.voted = true;
+    }
+    else {
+        res.locals.voted = false;
+    }
+
+    next();
+}
 
 /****************************************/
 

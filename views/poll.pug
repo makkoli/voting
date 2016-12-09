@@ -5,15 +5,20 @@ div(class="container poll-container")
     h2= name
     div(class="row")
         div(class="col-xs-6")
-            form(action="/poll/" + link, method="post" role="poll")
+            form(action="/poll/" + link, method="post", role="poll")
                 each label in labels
                     input(type="radio", name="option", value= label)
                     p= label
                     br
-                input(class="btn btn-info", type="submit", value="Vote")
+                //- Check if the user has voted on the poll or not
+                if votedOn
+                    input(class="btn btn-info", type="submit", value="Vote", disabled="true")
+                else
+                    input(class="btn btn-info", type="submit", value="Vote")
+                h4= error
         div(class="col-xs-6")
             canvas(id="pollChart", width="300", height="200")
             script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js")
-            script(src="/js/voting.js")
+            script(src="/js/pollchart.js")
             script.
                 generateChart("#{labels}", "#{votes}")

@@ -6,17 +6,18 @@ div(class="container poll-container")
     h6(style="color:red;") * = required
     h4= error
     form(action="/" + user + "/create" method="post" class="form-horizontal" role="create-poll")
-        div(class="form-group")
+        div(class="form-group" id="poll-info")
             label(for="question" class="col-sm-2 control-label") Question*
             div(class="col-sm-10")
                 input(type="text" class="form-control" name="question")
-        - for (var i = 1; i <= 10; i++)
-            div(class="form-group")
-                if i <= 2
-                    label(for="option " + i class="col-sm-2 control-label") Option #{i}*
-                else
-                    label(for="option " + i class="col-sm-2 control-label") Option #{i}
-                div(class="col-sm-10")
-                    input(type="text" class="form-control" name="option_" + i)
+            label(for="option 1", class="col-sm-2 control-label") Option 1*
+            div(class="col-sm-10")
+                input(type="text" class="col-sm-10 form-control" name="option_1")
+            label(for="option 2", class="col-sm-2 control-label") Option 2*
+            div(class="col-sm-10")
+                input(type="text" class="form-control" name="option_2")
+        button(type="button", class="btn btn-link" onClick="addOption()") Add Option
         div
             button(type="submit" value="Create" class="btn btn-info") Create Poll
+
+script(src="/js/createpoll.js")

@@ -1,0 +1,19 @@
+include mixins/container.pug
+
++container(logged, user)
+div(class="container poll-container")
+    h2= name
+    div(class="row")
+        div(class="col-xs-6")
+            h3 Total Votes: #{totalVotes}
+            form(action=link, method="post", role="add-option")
+                input(type="text", name="option")
+                button(type="submit", class="btn btn-info") Add Option
+            form(action=link + "/delete", method="post", role="delete-poll")
+                button(type="submit", class="btn btn-danger btn-xs") Delete Poll
+        div(class="col-xs-6")
+            canvas(id="pollChart", width="300", height="200")
+            script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js")
+            script(src="/js/pollchart.js")
+            script.
+                generateChart("#{labels}", "#{votes}")

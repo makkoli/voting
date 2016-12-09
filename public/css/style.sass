@@ -66,11 +66,17 @@ header
         padding-top: 50px
         margin: 0 auto
         padding-bottom: $default-vert-padding
-        button
+        button[type="submit"]
             float: right
-        p
-            display: inline
-            margin: 0
-            padding: 0
+        button[type="button"]
+            float: left
+        input
+            margin-bottom: 10px
     h4
         color: red
+    h3
+        text-decoration: underline
+        margin-bottom: $default-vert-padding
+    form[role="add-option"]
+        padding: $default-vert-padding
+        margin-bottom: $default-vert-padding

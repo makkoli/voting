@@ -4,7 +4,7 @@ include mixins/container.pug
 div(class="container poll-container")
     ul
         each poll, name in polls
-            a(href='/poll/' + poll.link)
+            a(href='polls/' + poll.link)
                 li= poll.name
     form(action="/" + user + "/create")
         button(class="btn btn-primary btn-block") Create a new poll
