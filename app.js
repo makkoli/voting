@@ -10,7 +10,8 @@ var express = require('express'),
     Poll = require('./models/poll-model'),
     app = express();
 
-var dbConnStr = 'mongodb://localhost:27017/voting';
+var dbConnStr = process.env.MONGOLAB_URI || 'mongodb://localhost:27017/voting';
+var port = process.env.PORT || 8000;
 // Connect mongoose to db
 mongoose.connect(dbConnStr, function(err) {
     if (err) throw err;
@@ -323,7 +324,7 @@ app.post('/:user/create', getLoginSession, function(req, res) {
             options: pollOptions,
             link: pollLink,
             creator: req.params.user,
-            date: new Date()
+            date: Date.now()
         });
 
         // Save the new poll to the database
@@ -391,7 +392,7 @@ function checkPollVotedOn(req, res, next) {
 
 /****************************************/
 
-var server = app.listen(8000, function() {
+var server = app.listen(port, function() {
     var port = server.address().port;
     console.log('Express server listening on port %s.', port);
 });

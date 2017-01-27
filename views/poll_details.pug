@@ -3,6 +3,8 @@ include mixins/container.pug
 +container(logged, user)
 div(class="container poll-container")
     h2= name
+    a(href="https://twitter.com/intent/tweet?text=" + name + '&url=http://localhost:8000/poll/' + link, class="twitter-share-button") Tweet
+    script(async, src="//platform.twitter.com/widgets.js", charset="utf-8")
     div(class="row")
         div(class="col-xs-6")
             h3 Total Votes: #{totalVotes}
